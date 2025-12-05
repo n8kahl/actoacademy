@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* ACTO Brand Colors */
+:root {
+  /* Primary */
+  --acto-teal: #14988B;
+  --acto-teal-light: #1ab3a3;
+  --acto-teal-dark: #0f756b;
+
+  /* Secondary */
+  --acto-dark-blue: #1D566C;
+  --acto-soft-blue: #C0DBF8;
+  --acto-plum: #99568B;
+  --acto-yellow: #EED180;
+
+  /* Neutral */
+  --acto-black: #2D2321;
+  --acto-gray-100: #F8F9FA;
+  --acto-gray-200: #E9ECEF;
+  --acto-gray-300: #DEE2E6;
+  --acto-gray-400: #CED4DA;
+  --acto-gray-500: #6C757D;
+
+  /* Semantic */
+  --background: #ffffff;
+  --foreground: #2D2321;
+}
+
+@theme inline {
+  /* ACTO Brand Colors */
+  --color-acto-teal: var(--acto-teal);
+  --color-acto-teal-light: var(--acto-teal-light);
+  --color-acto-teal-dark: var(--acto-teal-dark);
+  --color-acto-dark-blue: var(--acto-dark-blue);
+  --color-acto-soft-blue: var(--acto-soft-blue);
+  --color-acto-plum: var(--acto-plum);
+  --color-acto-yellow: var(--acto-yellow);
+  --color-acto-black: var(--acto-black);
+
+  /* Grays */
+  --color-gray-100: var(--acto-gray-100);
+  --color-gray-200: var(--acto-gray-200);
+  --color-gray-300: var(--acto-gray-300);
+  --color-gray-400: var(--acto-gray-400);
+  --color-gray-500: var(--acto-gray-500);
+
+  /* Background/Foreground */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Font */
+  --font-sans: var(--font-poppins);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins), 'Poppins', Arial, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--acto-gray-200);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--acto-teal);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--acto-teal-dark);
+}

@@ -15,15 +15,24 @@
 
   /* Neutral */
   --acto-black: #2D2321;
-  --acto-gray-100: #F8F9FA;
+  --acto-gray-50: #FAFBFC;
+  --acto-gray-100: #F4F6F8;
   --acto-gray-200: #E9ECEF;
   --acto-gray-300: #DEE2E6;
   --acto-gray-400: #CED4DA;
   --acto-gray-500: #6C757D;
+  --acto-gray-600: #495057;
 
   /* Semantic */
-  --background: #ffffff;
+  --background: #F8FAFC;
   --foreground: #2D2321;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  --shadow-glow: 0 0 40px -10px rgb(20 152 139 / 0.3);
 }
 
 @theme inline {
@@ -38,11 +47,13 @@
   --color-acto-black: var(--acto-black);
 
   /* Grays */
+  --color-gray-50: var(--acto-gray-50);
   --color-gray-100: var(--acto-gray-100);
   --color-gray-200: var(--acto-gray-200);
   --color-gray-300: var(--acto-gray-300);
   --color-gray-400: var(--acto-gray-400);
   --color-gray-500: var(--acto-gray-500);
+  --color-gray-600: var(--acto-gray-600);
 
   /* Background/Foreground */
   --color-background: var(--background);
@@ -52,10 +63,16 @@
   --font-sans: var(--font-poppins);
 }
 
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  background: var(--background);
+  background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
   color: var(--foreground);
-  font-family: var(--font-poppins), 'Poppins', Arial, sans-serif;
+  font-family: var(--font-poppins), 'Poppins', system-ui, sans-serif;
+  min-height: 100vh;
 }
 
 /* Smooth scrolling */
@@ -63,22 +80,101 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Modern scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--acto-gray-200);
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--acto-teal);
-  border-radius: 4px;
+  background: var(--acto-gray-300);
+  border-radius: 100px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--acto-teal-dark);
+  background: var(--acto-teal);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Modern card styles */
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-elevated {
+  background: white;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--acto-teal) 0%, var(--acto-dark-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle pattern background */
+.pattern-bg {
+  background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Animated gradient */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animated-gradient {
+  background: linear-gradient(135deg, var(--acto-teal), var(--acto-dark-blue), var(--acto-teal));
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--acto-teal);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: var(--acto-soft-blue);
+  color: var(--acto-dark-blue);
+}
+
+/* Transitions */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Button hover lift effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }

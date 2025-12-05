@@ -1,6 +1,6 @@
 'use client';
 
-import { Award, CheckCircle, Lock, Shield } from 'lucide-react';
+import { CheckCircle, Lock, Trophy } from 'lucide-react';
 import clsx from 'clsx';
 
 export interface Certification {
@@ -16,122 +16,128 @@ interface CertificationCardProps {
   certification: Certification;
 }
 
-const levelColors = {
+const levelConfig = {
   Bronze: {
-    gradient: 'from-amber-500 to-amber-700',
-    bg: 'bg-amber-50 border-amber-200',
+    gradient: 'from-amber-400 to-orange-500',
+    glow: 'shadow-amber-200/50',
+    bg: 'bg-amber-50',
     text: 'text-amber-600',
+    ring: 'ring-amber-200',
   },
   Silver: {
-    gradient: 'from-gray-400 to-gray-600',
-    bg: 'bg-gray-50 border-gray-200',
-    text: 'text-gray-600',
+    gradient: 'from-slate-300 to-slate-500',
+    glow: 'shadow-slate-200/50',
+    bg: 'bg-slate-50',
+    text: 'text-slate-600',
+    ring: 'ring-slate-200',
   },
   Gold: {
-    gradient: 'from-yellow-400 to-yellow-600',
-    bg: 'bg-yellow-50 border-yellow-200',
+    gradient: 'from-yellow-300 to-amber-500',
+    glow: 'shadow-yellow-200/50',
+    bg: 'bg-yellow-50',
     text: 'text-yellow-600',
+    ring: 'ring-yellow-200',
   },
   Platinum: {
-    gradient: 'from-cyan-400 to-blue-600',
-    bg: 'bg-blue-50 border-blue-200',
-    text: 'text-blue-600',
+    gradient: 'from-cyan-400 to-blue-500',
+    glow: 'shadow-cyan-200/50',
+    bg: 'bg-cyan-50',
+    text: 'text-cyan-600',
+    ring: 'ring-cyan-200',
   },
 };
 
 export default function CertificationCard({ certification }: CertificationCardProps) {
-  const colors = levelColors[certification.level];
+  const config = levelConfig[certification.level];
+  const isLocked = certification.status === 'locked';
+  const isEarned = certification.status === 'earned';
 
   return (
     <div
       className={clsx(
-        'relative overflow-hidden rounded-2xl p-6 border-2 transition-all',
-        certification.status === 'earned'
-          ? colors.bg
-          : certification.status === 'in-progress'
-          ? 'bg-white border-acto-teal/30'
-          : 'bg-gray-50 border-gray-200'
+        'group relative bg-white rounded-2xl p-5 border transition-all duration-200',
+        isLocked
+          ? 'border-gray-100 opacity-50'
+          : 'border-gray-100 hover:shadow-lg hover:shadow-gray-100/50'
       )}
     >
       {/* Badge */}
-      <div
-        className={clsx(
-          'w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-4',
-          colors.gradient,
-          certification.status === 'locked' && 'opacity-40'
-        )}
-      >
-        {certification.status === 'earned' ? (
-          <CheckCircle className="w-7 h-7 text-white" />
-        ) : certification.status === 'locked' ? (
-          <Lock className="w-7 h-7 text-white" />
-        ) : (
-          <Shield className="w-7 h-7 text-white" />
+      <div className="flex items-start justify-between mb-4">
+        <div
+          className={clsx(
+            'w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br',
+            config.gradient,
+            isLocked ? 'opacity-40' : `shadow-lg ${config.glow}`
+          )}
+        >
+          {isEarned ? (
+            <CheckCircle className="w-6 h-6 text-white" />
+          ) : isLocked ? (
+            <Lock className="w-5 h-5 text-white/80" />
+          ) : (
+            <Trophy className="w-5 h-5 text-white" />
+          )}
+        </div>
+
+        {isEarned && (
+          <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-600 text-xs font-medium">
+            <CheckCircle className="w-3 h-3" />
+            Earned
+          </span>
         )}
       </div>
 
-      {/* Level tag */}
+      {/* Level */}
       <span
         className={clsx(
-          'text-xs uppercase tracking-wider font-semibold',
-          certification.status === 'earned'
-            ? colors.text
-            : certification.status === 'in-progress'
-            ? 'text-acto-teal'
-            : 'text-gray-400'
+          'text-[10px] uppercase tracking-widest font-semibold',
+          isLocked ? 'text-gray-400' : config.text
         )}
       >
-        {certification.level} Level
+        {certification.level}
       </span>
 
       {/* Name */}
       <h3
         className={clsx(
-          'font-bold text-lg mt-1 mb-2',
-          certification.status === 'locked' ? 'text-gray-400' : 'text-acto-black'
+          'font-semibold text-base mt-1 mb-1',
+          isLocked ? 'text-gray-400' : 'text-acto-black'
         )}
       >
         {certification.name}
       </h3>
 
       {/* Modules */}
-      <p
-        className={clsx(
-          'text-sm mb-4',
-          certification.status === 'locked' ? 'text-gray-400' : 'text-gray-500'
-        )}
-      >
+      <p className="text-xs text-gray-400 mb-4">
         Modules {certification.modules}
       </p>
 
-      {/* Status-specific content */}
-      {certification.status === 'earned' && certification.date && (
-        <div className="flex items-center gap-2 text-green-600 text-sm font-medium">
-          <CheckCircle className="w-4 h-4" />
-          <span>Earned {certification.date}</span>
-        </div>
+      {/* Status content */}
+      {isEarned && certification.date && (
+        <p className="text-xs text-gray-500">
+          Achieved {certification.date}
+        </p>
       )}
 
       {certification.status === 'in-progress' && certification.progress !== undefined && (
         <div>
-          <div className="flex items-center justify-between text-sm mb-1">
-            <span className="text-gray-500">Progress</span>
-            <span className="text-acto-teal font-medium">{certification.progress}%</span>
+          <div className="flex items-center justify-between text-xs mb-1.5">
+            <span className="text-gray-400">Progress</span>
+            <span className="font-medium text-acto-teal">{certification.progress}%</span>
           </div>
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-acto-teal rounded-full transition-all"
+              className="h-full bg-gradient-to-r from-acto-teal to-acto-teal-light rounded-full transition-all"
               style={{ width: `${certification.progress}%` }}
             />
           </div>
         </div>
       )}
 
-      {certification.status === 'locked' && (
-        <div className="flex items-center gap-2 text-gray-400 text-sm">
-          <Lock className="w-4 h-4" />
-          <span>Complete previous level to unlock</span>
-        </div>
+      {isLocked && (
+        <p className="text-xs text-gray-400">
+          Complete previous level
+        </p>
       )}
     </div>
   );

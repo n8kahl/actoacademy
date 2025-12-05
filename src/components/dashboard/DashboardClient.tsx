@@ -21,9 +21,12 @@ import {
   Calendar,
   Send,
   BarChart3,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
+import clsx from 'clsx';
 
 // Icon mapping for modules
 const iconMap: Record<string, LucideIcon> = {
@@ -70,7 +73,6 @@ export default function DashboardClient({ modules, certifications }: DashboardCl
 
   // Transform database modules to UI format
   const transformedModules = modules.map((m, index) => {
-    // For demo purposes, mark first 2 as completed, 3rd as in-progress, rest as locked
     let status: 'completed' | 'in-progress' | 'locked' = 'locked';
     let progress = 0;
 
@@ -133,29 +135,42 @@ export default function DashboardClient({ modules, certifications }: DashboardCl
   const progressPercent = Math.round((completedCount / transformedModules.length) * 100);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="w-4 h-4 text-acto-yellow" />
+            <span className="text-sm text-gray-500">Welcome back</span>
+          </div>
+          <h1 className="text-2xl font-semibold text-acto-black">
+            Continue your learning journey
+          </h1>
+        </div>
+
         {/* Tab buttons */}
-        <div className="flex gap-2 mb-8">
+        <div className="flex gap-1 mb-8 p-1 bg-gray-100/80 rounded-xl w-fit">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            className={clsx(
+              'px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               activeTab === 'dashboard'
-                ? 'bg-acto-teal text-white'
-                : 'bg-white text-gray-600 border border-gray-200 hover:border-acto-teal'
-            }`}
+                ? 'bg-white text-acto-black shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            )}
           >
-            Dashboard
+            Overview
           </button>
           <button
             onClick={() => setActiveTab('courses')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            className={clsx(
+              'px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               activeTab === 'courses'
-                ? 'bg-acto-teal text-white'
-                : 'bg-white text-gray-600 border border-gray-200 hover:border-acto-teal'
-            }`}
+                ? 'bg-white text-acto-black shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            )}
           >
             All Courses
           </button>
@@ -164,69 +179,83 @@ export default function DashboardClient({ modules, certifications }: DashboardCl
         {activeTab === 'dashboard' && (
           <>
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
               <StatCard
                 label="Course Progress"
                 value={`${progressPercent}%`}
                 subtext={`${completedCount} of ${transformedModules.length} modules`}
                 icon={TrendingUp}
                 iconColor="text-green-500"
+                iconBg="bg-green-50"
               />
               <StatCard
                 label="Time Invested"
                 value="4.2 hrs"
                 subtext="~11 hrs remaining"
                 icon={Clock}
-                iconColor="text-acto-dark-blue"
+                iconColor="text-blue-500"
+                iconBg="bg-blue-50"
               />
               <StatCard
                 label="Quiz Score Avg"
                 value="92%"
                 subtext="23 questions answered"
                 icon={Star}
-                iconColor="text-acto-yellow"
+                iconColor="text-amber-500"
+                iconBg="bg-amber-50"
               />
               <StatCard
                 label="Certifications"
                 value={`1/${transformedCertifications.length}`}
                 subtext="Bronze earned"
                 icon={Award}
-                iconColor="text-acto-plum"
+                iconColor="text-purple-500"
+                iconBg="bg-purple-50"
               />
             </div>
 
             {/* Continue Learning */}
             {currentModule && (
-              <div className="mb-8">
-                <h2 className="text-xl font-bold text-acto-black mb-4">Continue Learning</h2>
-                <div className="bg-gradient-to-r from-acto-dark-blue to-acto-teal rounded-2xl p-6 text-white">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center">
-                        <currentModule.icon className="w-8 h-8 text-white" />
+              <div className="mb-10">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-acto-black">Continue Learning</h2>
+                </div>
+                <div className="relative overflow-hidden bg-gradient-to-br from-acto-dark-blue via-acto-dark-blue to-acto-teal rounded-2xl p-6 text-white">
+                  {/* Background decoration */}
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+                  <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center flex-shrink-0">
+                        <currentModule.icon className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold">{currentModule.title}</h3>
-                        <p className="text-white/80 text-sm">
-                          Module {currentModule.id} &bull; Lesson 5 of {currentModule.lessons}
+                        <p className="text-white/60 text-xs uppercase tracking-wider mb-1">
+                          Module {currentModule.id}
                         </p>
-                        <div className="flex items-center gap-4 mt-2">
-                          <div className="w-48 h-2 bg-white/30 rounded-full overflow-hidden">
+                        <h3 className="text-xl font-semibold mb-1">{currentModule.title}</h3>
+                        <p className="text-white/70 text-sm">
+                          Lesson 5 of {currentModule.lessons}
+                        </p>
+                        <div className="flex items-center gap-3 mt-3">
+                          <div className="w-32 h-1.5 bg-white/20 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-white rounded-full"
                               style={{ width: `${currentModule.progress}%` }}
                             />
                           </div>
-                          <span className="text-sm text-white/80">{currentModule.progress}%</span>
+                          <span className="text-xs text-white/70">{currentModule.progress}% complete</span>
                         </div>
                       </div>
                     </div>
                     <Link
                       href={`/modules/${currentModule.id}`}
-                      className="flex items-center gap-2 px-6 py-3 bg-white text-acto-dark-blue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-white text-acto-dark-blue font-medium rounded-xl hover:bg-gray-50 transition-colors shadow-lg shadow-black/10"
                     >
                       <Play className="w-4 h-4" />
                       Resume
+                      <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
                 </div>
@@ -234,18 +263,31 @@ export default function DashboardClient({ modules, certifications }: DashboardCl
             )}
 
             {/* Certification Journey */}
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-acto-black mb-4">Certification Journey</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="mb-10">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-acto-black">Certification Path</h2>
+                <Link href="/certifications" className="text-sm text-acto-teal hover:underline flex items-center gap-1">
+                  View all <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {transformedCertifications.map((cert) => (
                   <CertificationCard key={cert.name} certification={cert} />
                 ))}
               </div>
             </div>
 
-            {/* Recent Modules */}
+            {/* Modules */}
             <div>
-              <h2 className="text-xl font-bold text-acto-black mb-4">Your Modules</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-acto-black">Your Modules</h2>
+                <button
+                  onClick={() => setActiveTab('courses')}
+                  className="text-sm text-acto-teal hover:underline flex items-center gap-1"
+                >
+                  View all <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {transformedModules.slice(0, 6).map((module) => (
                   <ModuleCard key={module.id} module={module} />
@@ -258,13 +300,25 @@ export default function DashboardClient({ modules, certifications }: DashboardCl
         {activeTab === 'courses' && (
           <>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-acto-black">All Modules</h2>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-green-600">{completedCount} Completed</span>
-                <span className="text-gray-300">&bull;</span>
-                <span className="text-acto-teal">{inProgressCount} In Progress</span>
-                <span className="text-gray-300">&bull;</span>
-                <span className="text-gray-500">{lockedCount} Locked</span>
+              <div>
+                <h2 className="text-lg font-semibold text-acto-black">All Modules</h2>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {transformedModules.length} modules in your learning path
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1.5 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-green-400" />
+                  {completedCount} Completed
+                </span>
+                <span className="flex items-center gap-1.5 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-acto-teal" />
+                  {inProgressCount} In Progress
+                </span>
+                <span className="flex items-center gap-1.5 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-gray-300" />
+                  {lockedCount} Locked
+                </span>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -277,16 +331,16 @@ export default function DashboardClient({ modules, certifications }: DashboardCl
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <footer className="mt-16 py-8 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-400">
               &copy; {new Date().getFullYear()} ACTO. Intelligent Field Excellence for Life Sciences.
             </p>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <a href="#" className="hover:text-acto-teal transition-colors">Help Center</a>
-              <a href="#" className="hover:text-acto-teal transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-acto-teal transition-colors">Terms of Service</a>
+            <div className="flex items-center gap-6 text-xs text-gray-400">
+              <a href="#" className="hover:text-acto-teal transition-colors">Help</a>
+              <a href="#" className="hover:text-acto-teal transition-colors">Privacy</a>
+              <a href="#" className="hover:text-acto-teal transition-colors">Terms</a>
             </div>
           </div>
         </div>

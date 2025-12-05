@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, BookOpen, Lock, CheckCircle, Play } from 'lucide-react';
+import { Clock, BookOpen, Lock, CheckCircle, ArrowRight } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -22,123 +22,118 @@ interface ModuleCardProps {
   onClick?: () => void;
 }
 
-export default function ModuleCard({ module, onClick }: ModuleCardProps) {
+export default function ModuleCard({ module }: ModuleCardProps) {
   const Icon = module.icon;
   const isClickable = module.status !== 'locked';
-
-  const statusStyles = {
-    completed: 'bg-green-50 border-green-200 hover:border-green-300',
-    'in-progress': 'bg-acto-soft-blue/30 border-acto-teal/30 hover:border-acto-teal',
-    locked: 'bg-gray-50 border-gray-200',
-  };
-
-  const statusBadge = {
-    completed: { bg: 'bg-green-100 text-green-700 border-green-200', label: 'Completed' },
-    'in-progress': { bg: 'bg-acto-soft-blue text-acto-dark-blue border-acto-teal/30', label: 'In Progress' },
-    locked: { bg: 'bg-gray-100 text-gray-500 border-gray-200', label: 'Locked' },
-  };
 
   const CardContent = (
     <div
       className={clsx(
-        'rounded-2xl p-6 border-2 transition-all',
-        statusStyles[module.status],
-        isClickable && 'cursor-pointer hover:shadow-md hover:scale-[1.02]'
+        'group relative bg-white rounded-2xl p-5 border transition-all duration-200',
+        module.status === 'locked'
+          ? 'border-gray-100 opacity-60'
+          : 'border-gray-100 hover:border-gray-200 hover:shadow-lg hover:shadow-gray-100/50',
+        isClickable && 'cursor-pointer'
       )}
     >
+      {/* Status indicator line */}
+      <div
+        className={clsx(
+          'absolute top-0 left-6 right-6 h-0.5 rounded-full',
+          module.status === 'completed' && 'bg-green-400',
+          module.status === 'in-progress' && 'bg-acto-teal',
+          module.status === 'locked' && 'bg-gray-200'
+        )}
+      />
+
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start gap-4 mb-4 pt-2">
         <div
           className={clsx(
-            'w-12 h-12 rounded-xl flex items-center justify-center',
-            module.status === 'locked' ? 'bg-gray-200' : 'bg-acto-teal'
+            'w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0',
+            module.status === 'locked'
+              ? 'bg-gray-100'
+              : module.status === 'completed'
+              ? 'bg-green-50'
+              : 'bg-gradient-to-br from-acto-teal to-acto-dark-blue shadow-lg shadow-acto-teal/20'
           )}
         >
           {module.status === 'locked' ? (
-            <Lock className="w-6 h-6 text-gray-400" />
+            <Lock className="w-5 h-5 text-gray-400" />
+          ) : module.status === 'completed' ? (
+            <CheckCircle className="w-5 h-5 text-green-500" />
           ) : (
-            <Icon className="w-6 h-6 text-white" />
+            <Icon className="w-5 h-5 text-white" />
           )}
         </div>
-        <span
-          className={clsx(
-            'px-2.5 py-1 rounded-full text-xs font-medium border',
-            statusBadge[module.status].bg
-          )}
-        >
-          {statusBadge[module.status].label}
-        </span>
+
+        <div className="flex-1 min-w-0">
+          <h3
+            className={clsx(
+              'font-semibold text-base leading-tight mb-1 truncate',
+              module.status === 'locked' ? 'text-gray-400' : 'text-acto-black'
+            )}
+          >
+            {module.title}
+          </h3>
+          <div className="flex items-center gap-3 text-xs text-gray-400">
+            <span className="flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              {module.duration}
+            </span>
+            <span className="flex items-center gap-1">
+              <BookOpen className="w-3.5 h-3.5" />
+              {module.lessons} lessons
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Content */}
-      <h3
-        className={clsx(
-          'font-bold text-lg mb-1',
-          module.status === 'locked' ? 'text-gray-400' : 'text-acto-black'
-        )}
-      >
-        {module.title}
-      </h3>
+      {/* Description */}
       <p
         className={clsx(
-          'text-sm mb-4',
-          module.status === 'locked' ? 'text-gray-400' : 'text-gray-600'
+          'text-sm leading-relaxed mb-4 line-clamp-2',
+          module.status === 'locked' ? 'text-gray-400' : 'text-gray-500'
         )}
       >
         {module.description}
       </p>
 
-      {/* Meta */}
-      <div className="flex items-center gap-4 text-sm">
-        <span
-          className={clsx(
-            'flex items-center gap-1',
-            module.status === 'locked' ? 'text-gray-400' : 'text-gray-500'
-          )}
-        >
-          <Clock className="w-4 h-4" />
-          {module.duration}
-        </span>
-        <span
-          className={clsx(
-            'flex items-center gap-1',
-            module.status === 'locked' ? 'text-gray-400' : 'text-gray-500'
-          )}
-        >
-          <BookOpen className="w-4 h-4" />
-          {module.lessons} lessons
-        </span>
-      </div>
-
       {/* Progress bar for in-progress */}
       {module.status === 'in-progress' && (
-        <div className="mt-4">
-          <div className="flex justify-between text-xs text-gray-500 mb-1">
-            <span>Progress</span>
-            <span>{module.progress}%</span>
+        <div className="mb-4">
+          <div className="flex justify-between text-xs mb-1.5">
+            <span className="text-gray-400">Progress</span>
+            <span className="font-medium text-acto-teal">{module.progress}%</span>
           </div>
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-acto-teal rounded-full transition-all"
+              className="h-full bg-gradient-to-r from-acto-teal to-acto-teal-light rounded-full transition-all"
               style={{ width: `${module.progress}%` }}
             />
           </div>
         </div>
       )}
 
-      {/* Action hint */}
-      {module.status === 'completed' && (
-        <div className="mt-4 flex items-center gap-2 text-green-600 text-sm font-medium">
-          <CheckCircle className="w-4 h-4" />
-          <span>Review Module</span>
-        </div>
-      )}
-      {module.status === 'in-progress' && (
-        <div className="mt-4 flex items-center gap-2 text-acto-teal text-sm font-medium">
-          <Play className="w-4 h-4" />
-          <span>Continue Learning</span>
-        </div>
-      )}
+      {/* Footer */}
+      <div className="flex items-center justify-between pt-3 border-t border-gray-50">
+        {module.status === 'completed' && (
+          <span className="text-xs font-medium text-green-600 flex items-center gap-1">
+            <CheckCircle className="w-3.5 h-3.5" />
+            Completed
+          </span>
+        )}
+        {module.status === 'in-progress' && (
+          <span className="text-xs font-medium text-acto-teal">Continue learning</span>
+        )}
+        {module.status === 'locked' && (
+          <span className="text-xs text-gray-400">Locked</span>
+        )}
+
+        {isClickable && (
+          <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-acto-teal group-hover:translate-x-1 transition-all" />
+        )}
+      </div>
     </div>
   );
 

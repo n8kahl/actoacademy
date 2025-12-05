@@ -47,8 +47,16 @@ const levelConfig = {
   },
 };
 
+const defaultConfig = {
+  gradient: 'from-gray-400 to-gray-600',
+  glow: 'shadow-gray-200/50',
+  bg: 'bg-gray-50',
+  text: 'text-gray-600',
+  ring: 'ring-gray-200',
+};
+
 export default function CertificationCard({ certification }: CertificationCardProps) {
-  const config = levelConfig[certification.level];
+  const config = levelConfig[certification.level] || defaultConfig;
   const isLocked = certification.status === 'locked';
   const isEarned = certification.status === 'earned';
 

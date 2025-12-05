@@ -114,9 +114,14 @@ export default function DashboardClient({ modules, certifications }: DashboardCl
       progress = 52;
     }
 
+    // Normalize level to proper case (e.g., "bronze" -> "Bronze")
+    const normalizedLevel = c.level
+      ? (c.level.charAt(0).toUpperCase() + c.level.slice(1).toLowerCase()) as 'Bronze' | 'Silver' | 'Gold' | 'Platinum'
+      : 'Bronze';
+
     return {
       name: c.name,
-      level: c.level as 'Bronze' | 'Silver' | 'Gold' | 'Platinum',
+      level: normalizedLevel,
       modules: c.required_modules.length > 0
         ? `1-${Math.max(...c.required_modules)}`
         : '',

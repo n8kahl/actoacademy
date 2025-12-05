@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Clock, BookOpen, Lock, CheckCircle, Play } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import clsx from 'clsx';
@@ -23,6 +24,7 @@ interface ModuleCardProps {
 
 export default function ModuleCard({ module, onClick }: ModuleCardProps) {
   const Icon = module.icon;
+  const isClickable = module.status !== 'locked';
 
   const statusStyles = {
     completed: 'bg-green-50 border-green-200 hover:border-green-300',
@@ -36,13 +38,12 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
     locked: { bg: 'bg-gray-100 text-gray-500 border-gray-200', label: 'Locked' },
   };
 
-  return (
+  const CardContent = (
     <div
-      onClick={module.status !== 'locked' ? onClick : undefined}
       className={clsx(
         'rounded-2xl p-6 border-2 transition-all',
         statusStyles[module.status],
-        module.status !== 'locked' && 'cursor-pointer hover:shadow-md hover:scale-[1.02]'
+        isClickable && 'cursor-pointer hover:shadow-md hover:scale-[1.02]'
       )}
     >
       {/* Header */}
@@ -140,4 +141,14 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
       )}
     </div>
   );
+
+  if (isClickable) {
+    return (
+      <Link href={`/modules/${module.id}`}>
+        {CardContent}
+      </Link>
+    );
+  }
+
+  return CardContent;
 }

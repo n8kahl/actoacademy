@@ -1,8 +1,6 @@
-'use client';
-
-import { use } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
+import { getModuleWithLessons } from '@/lib/data';
 import {
   ArrowLeft,
   Clock,
@@ -10,98 +8,80 @@ import {
   CheckCircle,
   Lock,
   Play,
-  FileText,
   ChevronRight,
 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import clsx from 'clsx';
 
-// Mock data - will be replaced with Supabase queries
-const modulesData: Record<number, {
-  id: number;
-  title: string;
-  description: string;
-  duration: string;
-  icon: string;
-  lessons: {
+interface ModulePageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function ModulePage({ params }: ModulePageProps) {
+  const resolvedParams = await params;
+  const moduleId = parseInt(resolvedParams.id);
+  const moduleData = await getModuleWithLessons(moduleId);
+
+  if (!moduleData) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-acto-teal mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </Link>
+          <div className="bg-white rounded-2xl p-8 border border-gray-200 text-center">
+            <Lock className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-acto-black mb-2">Module Not Found</h1>
+            <p className="text-gray-600">This module doesn&apos;t exist or is not available yet.</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Transform lessons with demo statuses (will be replaced with real user progress)
+  const lessons = (moduleData.lessons || []).map((lesson: {
     id: number;
     title: string;
     description: string;
-    duration: string;
-    status: 'completed' | 'in-progress' | 'not-started' | 'locked';
-    hasQuiz: boolean;
-  }[];
-}> = {
-  1: {
-    id: 1,
-    title: 'Platform Essentials',
-    description: 'Navigation, domain setup, and core configuration. This module covers everything you need to know to get started with the ACTO platform.',
-    duration: '45 min',
-    icon: 'Settings',
-    lessons: [
-      { id: 1, title: 'Homepage Navigation', description: 'Learn to navigate the ACTO homepage', duration: '3 min', status: 'completed', hasQuiz: true },
-      { id: 2, title: 'Switching Admin/User Mode', description: 'Understand the difference between modes', duration: '2 min', status: 'completed', hasQuiz: false },
-      { id: 3, title: 'Domain Configuration', description: 'Configure your domain settings', duration: '5 min', status: 'completed', hasQuiz: true },
-      { id: 4, title: 'Branding & Taxonomy', description: 'Customize your platform branding', duration: '4 min', status: 'completed', hasQuiz: false },
-      { id: 5, title: 'Notification Settings', description: 'Set up notification preferences', duration: '3 min', status: 'completed', hasQuiz: true },
-    ],
-  },
-  2: {
-    id: 2,
-    title: 'User Management',
-    description: 'Teams, territories, roles, and permissions. Learn how to manage your organization\'s user hierarchy effectively.',
-    duration: '60 min',
-    icon: 'Users',
-    lessons: [
-      { id: 6, title: 'User Management Overview', description: 'Introduction to user management', duration: '4 min', status: 'completed', hasQuiz: false },
-      { id: 7, title: 'Teams & Territories', description: 'Organize users into teams', duration: '6 min', status: 'completed', hasQuiz: true },
-      { id: 8, title: 'Adding/Updating Users', description: 'Create and modify user accounts', duration: '5 min', status: 'completed', hasQuiz: false },
-      { id: 9, title: 'Roles & Permissions', description: 'Configure role-based access', duration: '8 min', status: 'completed', hasQuiz: true },
-      { id: 10, title: 'Bulk User Import', description: 'Import users via CSV', duration: '4 min', status: 'completed', hasQuiz: true },
-    ],
-  },
-  3: {
-    id: 3,
-    title: 'Content Management',
-    description: 'Digital asset library and form creation. Master the content management system to create engaging learning materials.',
-    duration: '90 min',
-    icon: 'FileText',
-    lessons: [
-      { id: 11, title: 'Content Management Overview', description: 'Introduction to the CMS', duration: '4 min', status: 'completed', hasQuiz: false },
-      { id: 12, title: 'Folder Structure & Organization', description: 'Organize your content library', duration: '5 min', status: 'completed', hasQuiz: false },
-      { id: 13, title: 'Uploading Resources', description: 'Add files and media', duration: '6 min', status: 'completed', hasQuiz: true },
-      { id: 14, title: 'Resource Types & Permissions', description: 'Configure access controls', duration: '7 min', status: 'completed', hasQuiz: false },
-      { id: 15, title: 'Creating Forms', description: 'Build quizzes, surveys, and polls', duration: '12 min', status: 'in-progress', hasQuiz: true },
-      { id: 16, title: 'Digital Signatures', description: 'Set up e-signature workflows', duration: '4 min', status: 'not-started', hasQuiz: false },
-      { id: 17, title: 'FCRs, Assessments, Evaluations', description: 'Create evaluation forms', duration: '10 min', status: 'locked', hasQuiz: true },
-      { id: 18, title: 'Content Expiry & Activity Log', description: 'Manage content lifecycle', duration: '4 min', status: 'locked', hasQuiz: false },
-    ],
-  },
-};
+    duration_minutes: number;
+    has_quiz: boolean;
+    order_index: number;
+  }, index: number) => {
+    // For demo: first 4 completed, 5th in-progress, 6th not-started, rest locked
+    let status: 'completed' | 'in-progress' | 'not-started' | 'locked' = 'locked';
+    if (moduleId <= 2) {
+      status = 'completed'; // All lessons in first 2 modules completed
+    } else if (moduleId === 3) {
+      if (index < 4) status = 'completed';
+      else if (index === 4) status = 'in-progress';
+      else if (index === 5) status = 'not-started';
+      else status = 'locked';
+    }
 
-// Default for locked modules
-const defaultModule = {
-  id: 0,
-  title: 'Module Coming Soon',
-  description: 'This module content is being prepared.',
-  duration: '-- min',
-  icon: 'Lock',
-  lessons: [],
-};
+    return {
+      id: lesson.id,
+      title: lesson.title,
+      description: lesson.description || '',
+      duration: `${lesson.duration_minutes} min`,
+      status,
+      hasQuiz: lesson.has_quiz,
+    };
+  });
 
-export default function ModulePage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
-  const moduleId = parseInt(resolvedParams.id);
-  const module = modulesData[moduleId] || { ...defaultModule, id: moduleId };
-
-  const completedLessons = module.lessons.filter(l => l.status === 'completed').length;
-  const progressPercent = module.lessons.length > 0
-    ? Math.round((completedLessons / module.lessons.length) * 100)
+  const completedLessons = lessons.filter((l: { status: string }) => l.status === 'completed').length;
+  const progressPercent = lessons.length > 0
+    ? Math.round((completedLessons / lessons.length) * 100)
     : 0;
 
-  const IconComponent = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[module.icon] || Icons.BookOpen;
+  const IconComponent = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[moduleData.icon] || Icons.BookOpen;
 
-  const statusColors = {
+  const statusColors: Record<string, string> = {
     completed: 'bg-green-100 text-green-700 border-green-200',
     'in-progress': 'bg-acto-soft-blue text-acto-dark-blue border-acto-teal/30',
     'not-started': 'bg-gray-100 text-gray-600 border-gray-200',
@@ -129,17 +109,17 @@ export default function ModulePage({ params }: { params: Promise<{ id: string }>
               <IconComponent className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-acto-black mb-2">{module.title}</h1>
-              <p className="text-gray-600 mb-4">{module.description}</p>
+              <h1 className="text-2xl font-bold text-acto-black mb-2">{moduleData.title}</h1>
+              <p className="text-gray-600 mb-4">{moduleData.description}</p>
 
               <div className="flex flex-wrap items-center gap-4 text-sm">
                 <span className="flex items-center gap-1 text-gray-500">
                   <Clock className="w-4 h-4" />
-                  {module.duration}
+                  {moduleData.duration_minutes} min
                 </span>
                 <span className="flex items-center gap-1 text-gray-500">
                   <BookOpen className="w-4 h-4" />
-                  {module.lessons.length} lessons
+                  {lessons.length} lessons
                 </span>
                 <span className="flex items-center gap-1 text-green-600">
                   <CheckCircle className="w-4 h-4" />
@@ -171,7 +151,14 @@ export default function ModulePage({ params }: { params: Promise<{ id: string }>
           </div>
 
           <div className="divide-y divide-gray-100">
-            {module.lessons.map((lesson, index) => (
+            {lessons.map((lesson: {
+              id: number;
+              title: string;
+              description: string;
+              duration: string;
+              status: 'completed' | 'in-progress' | 'not-started' | 'locked';
+              hasQuiz: boolean;
+            }, index: number) => (
               <Link
                 key={lesson.id}
                 href={lesson.status !== 'locked' ? `/modules/${moduleId}/lessons/${lesson.id}` : '#'}
@@ -243,17 +230,17 @@ export default function ModulePage({ params }: { params: Promise<{ id: string }>
         </div>
 
         {/* Continue button */}
-        {module.lessons.some(l => l.status === 'in-progress' || l.status === 'not-started') && (
+        {lessons.some((l: { status: string }) => l.status === 'in-progress' || l.status === 'not-started') && (
           <div className="mt-6 text-center">
             <Link
               href={`/modules/${moduleId}/lessons/${
-                module.lessons.find(l => l.status === 'in-progress')?.id ||
-                module.lessons.find(l => l.status === 'not-started')?.id
+                lessons.find((l: { status: string }) => l.status === 'in-progress')?.id ||
+                lessons.find((l: { status: string }) => l.status === 'not-started')?.id
               }`}
               className="inline-flex items-center gap-2 px-8 py-3 bg-acto-teal text-white font-semibold rounded-xl hover:bg-acto-teal-dark transition-colors"
             >
               <Play className="w-5 h-5" />
-              {module.lessons.some(l => l.status === 'in-progress') ? 'Continue Learning' : 'Start Module'}
+              {lessons.some((l: { status: string }) => l.status === 'in-progress') ? 'Continue Learning' : 'Start Module'}
             </Link>
           </div>
         )}
